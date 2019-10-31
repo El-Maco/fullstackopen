@@ -1,0 +1,12 @@
+# Made using https://www.websequencediagrams.com
+# Situation when submitting note to the spa version of the notes app
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa - JSON-data
+server-->browser: new_note_spa - 201 created (no redirect)
+note over browser:
+Javascript code
+end note
+
+browser->browser: GET data.json
+browser->browser: POST new_note_spa
+browser->browser: new note to list and rerender page - notes.push(note)
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
