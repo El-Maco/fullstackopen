@@ -3,7 +3,8 @@ Helsinki University fullstack course
 
 * Name: Marcus Myllyviita
 * School: Aalto-university
-* Student number: 526746
+* University of Helsinki student number: 015219446
+* Aalto student number: 526746
 
 
 
