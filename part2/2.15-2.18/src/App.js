@@ -22,14 +22,24 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    const nameObject = {
-      name : newName,
-      number : newNumber,
-      id : persons.length + 1
-    }
-    if (persons.some(person => person.name === newName)) {
-      window.alert(newName + " is already added to the phonebook")
+    if (persons.some(person => person.name.toLowerCase() === newName.toLowerCase())) {
+      if(window.confirm(newName + " is already added to the phonebook, replace the old number with a new one?")) {
+        const person = persons.find(person => person.name.toLowerCase() === newName.toLocaleLowerCase())
+        const changedPerson = { ...person, number : newNumber }
+        personService
+          .update(person.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.name.toLowerCase() !== newName.toLowerCase() ? person : returnedPerson ))
+          })
+          console.log("Changed number for '" + person.name + "' to " + newNumber)
+      } else {
+        console.log("Number change prompt canceled")
+      }
     } else {
+      const nameObject = {
+        name : newName,
+        number : newNumber
+      }
       personService
         .create(nameObject)
         .then(returnedPerson => {
@@ -41,7 +51,7 @@ const App = () => {
   }
 
   const deletePerson = (id) => {
-    if(window.confirm("Delete " + persons.find(person => person.id == id).name)) {
+    if(window.confirm("Delete " + persons.find(person => person.id === id).name)) {
       personService
         .del(id)
         .then(returnedPerson => {
