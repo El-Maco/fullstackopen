@@ -14,6 +14,7 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
+
 describe('blog tests', () => {
   test('blogs are returned as json', async () => {
     await api
@@ -34,6 +35,14 @@ describe('blog tests', () => {
     expect(titles).toContain(
       'React patterns'
     )
+  })
+
+  test('all blogs have id property', async () => {
+    const response = await api.get('/api/blogs')
+
+    expect(response.body[0].id).toBeDefined()
+    expect(response.body[0]._id).not.toBeDefined()
+    expect(response.body[0].__v).not.toBeDefined()
   })
 })
 
