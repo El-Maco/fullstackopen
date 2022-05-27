@@ -82,7 +82,30 @@ describe('blog tests', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    expect(response.body.likes).toBe(0)
+    expect(response.body.likes).toEqual(0)
+  })
+
+  test('title and/or url is missing and returns 404', async () => {
+    const newBlog1 = {
+      author: 'Teemu Teekkari',
+      url: 'https://zerolikes.com/0',
+    }
+    const newBlog2 = {
+      title: 'title of blog with no likes',
+      author: 'Teemu Teekkari',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog1)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog2)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
   })
 })
 
