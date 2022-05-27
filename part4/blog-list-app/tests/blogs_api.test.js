@@ -44,8 +44,31 @@ describe('blog tests', () => {
     expect(response.body[0]._id).not.toBeDefined()
     expect(response.body[0].__v).not.toBeDefined()
   })
-})
 
+
+  test('a valid blog can be added', async () => {
+    const newBlog = {
+      title: 'async/await post test title',
+      author: 'Michael Chan',
+      url: 'https://reactpatterns.com/async_await_test',
+      likes: 9,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+
+    const titles = blogsAtEnd.map(r => r.title)
+    expect(titles).toContain(
+      'async/await post test title'
+    )
+  })
+})
 
 afterAll(() => {
   mongoose.connection.close()
