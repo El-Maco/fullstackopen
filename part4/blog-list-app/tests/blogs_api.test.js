@@ -127,6 +127,19 @@ describe('deletion of a specific blog', () => {
   })
 })
 
+describe('Changes to specific blog', () => {
+  test('add a like to a blog', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const blogToChange = blogsAtStart[0]
+    blogToChange.likes = blogToChange.likes + 10
+
+    await api
+      .put(`/api/blogs/${blogToChange.id}`)
+      .send(blogToChange)
+      .expect(200)
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
