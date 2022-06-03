@@ -22,7 +22,7 @@ mongoose
 app.use(cors())
 app.use(express.json())
 
-
+app.use(middleware.tokenExtractor)
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
