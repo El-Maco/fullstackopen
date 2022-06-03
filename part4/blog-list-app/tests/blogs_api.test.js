@@ -156,9 +156,10 @@ describe('testing users', () => {
     const usersAtStart = await helper.usersInDb()
 
     const newUser = {
-      username: 'mluukkai',
-      name: 'Matti Luukkainen',
+      username: 'myllyvm1',
+      name: 'Marcus Myllyviita',
       password: 'salainen',
+      blogs: [],
     }
 
     await api
@@ -181,6 +182,7 @@ describe('testing users', () => {
       username: 'root',
       name: 'Superuser',
       password: 'salainen',
+      blogs: [],
     }
 
     const result = await api
@@ -193,6 +195,44 @@ describe('testing users', () => {
 
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toEqual(usersAtStart)
+  })
+
+  test('creation fails with proper statuscode and message if username too short', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'mm',
+      name: 'Marcus Myllyviita',
+      password: 'longenoughpassword',
+      blogs: []
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('is shorter than the minimum allowed length (3)')
+  })
+
+  test('creation fails with proper statuscode and message if password too short', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'myllyvm1',
+      name: 'Marcus Myllyviita',
+      password: 'pw',
+      blogs: []
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('is shorter than the minimum allowed length (3)')
   })
 })
 
