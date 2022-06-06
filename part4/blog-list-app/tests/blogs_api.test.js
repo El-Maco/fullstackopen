@@ -8,16 +8,43 @@ const helper = require('./test_helper')
 const api = supertest(app)
 
 
+let user_token
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  const user_login = {
+    username: 'root',
+    name: 'root_user',
+    password: 'sekret'
+  }
+
+  const passwordHash = await bcrypt.hash(user_login.password, 10)
+  const user = new User({
+    username: user_login.username,
+    name: user_login.name,
+    passwordHash
+  })
+
+  await user.save()
+
+  const login_res = await api
+    .post('/api/login')
+    .send(user_login)
+
+  user_token = login_res.body.token
 
   const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+
+
 })
 
 
 describe('blog tests', () => {
+
+
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -59,6 +86,7 @@ describe('blog tests', () => {
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `bearer ${user_token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -81,6 +109,7 @@ describe('blog tests', () => {
     const response = await api
       .post('/api/blogs')
       .send(newBlog)
+      .set('Authorization', `bearer ${user_token}`)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
@@ -100,12 +129,14 @@ describe('blog tests', () => {
     await api
       .post('/api/blogs')
       .send(newBlog1)
+      .set('Authorization', `bearer ${user_token}`)
       .expect(400)
       .expect('Content-Type', /application\/json/)
 
     await api
       .post('/api/blogs')
       .send(newBlog2)
+      .set('Authorization', `bearer ${user_token}`)
       .expect(400)
       .expect('Content-Type', /application\/json/)
   })
@@ -114,18 +145,30 @@ describe('blog tests', () => {
 describe('deletion of a specific blog', () => {
   test('succeeds with status code 204 for valid id', async () => {
     const blogsAtStart = await helper.blogsInDb()
-    const blogToDelete = blogsAtStart[0]
+
+    const blog = {
+      author: 'root author',
+      title: 'root title',
+      url: 'root.com'
+    }
+
+    const blogToDelete = await api
+      .post('/api/blogs')
+      .send(blog)
+      .set('Authorization', `bearer ${user_token}`)
+    console.log(blogToDelete.body)
 
     await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
+      .delete(`/api/blogs/${blogToDelete.body.id}`)
+      .set('Authorization', `bearer ${user_token}`)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
 
-    expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
 
     const ids = blogsAtEnd.map(r => r.id)
-    expect(ids).not.toContain(blogToDelete.id)
+    expect(ids).not.toContain(blogToDelete.body.id)
   })
 })
 
@@ -143,14 +186,6 @@ describe('Changes to specific blog', () => {
 })
 
 describe('testing users', () => {
-  beforeEach(async () => {
-    await User.deleteMany({})
-
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new User({ username: 'root', passwordHash })
-
-    await user.save()
-  })
 
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
