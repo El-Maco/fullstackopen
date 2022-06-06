@@ -186,6 +186,21 @@ describe('Changes to specific blog', () => {
   })
 })
 
+describe('Creation of blog without token', () => {
+  test('fails with status code 401 id no token provided', async () => {
+    const blog = {
+      author: 'root author',
+      title: 'root title',
+      url: 'root.com'
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(blog)
+      .expect(401)
+  })
+})
+
 describe('testing users', () => {
 
   test('creation succeeds with a fresh username', async () => {
@@ -234,8 +249,6 @@ describe('testing users', () => {
   })
 
   test('creation fails with proper statuscode and message if username too short', async () => {
-    const usersAtStart = await helper.usersInDb()
-
     const newUser = {
       username: 'mm',
       name: 'Marcus Myllyviita',
@@ -253,8 +266,6 @@ describe('testing users', () => {
   })
 
   test('creation fails with proper statuscode and message if password too short', async () => {
-    const usersAtStart = await helper.usersInDb()
-
     const newUser = {
       username: 'myllyvm1',
       name: 'Marcus Myllyviita',
