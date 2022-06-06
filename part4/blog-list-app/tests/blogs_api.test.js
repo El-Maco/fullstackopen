@@ -143,9 +143,8 @@ describe('blog tests', () => {
 })
 
 describe('deletion of a specific blog', () => {
-  test('succeeds with status code 204 for valid id', async () => {
-    const blogsAtStart = await helper.blogsInDb()
-
+  let blogToDelete_id
+  beforeEach(async () => {
     const blog = {
       author: 'root author',
       title: 'root title',
@@ -156,19 +155,21 @@ describe('deletion of a specific blog', () => {
       .post('/api/blogs')
       .send(blog)
       .set('Authorization', `bearer ${user_token}`)
-    console.log(blogToDelete.body)
-
+    blogToDelete_id = blogToDelete.body.id
+  })
+  test('succeeds with status code 204 for valid id', async () => {
+    const blogsAtStart = await helper.blogsInDb()
     await api
-      .delete(`/api/blogs/${blogToDelete.body.id}`)
+      .delete(`/api/blogs/${blogToDelete_id}`)
       .set('Authorization', `bearer ${user_token}`)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
 
-    expect(blogsAtEnd).toHaveLength(blogsAtStart.length)
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
 
     const ids = blogsAtEnd.map(r => r.id)
-    expect(ids).not.toContain(blogToDelete.body.id)
+    expect(ids).not.toContain(blogToDelete_id)
   })
 })
 
