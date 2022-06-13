@@ -2,18 +2,21 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
-import login from './services/login'
+//import login from './services/login'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [errorMessage, setErrorMessge] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [notification, setNotification] = useState({
+    message: null,
+    severity: ""
+  })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -29,6 +32,20 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  const showNotification = (message) => {
+    setNotification({ message, severity: "blog" })
+    setTimeout(() => {
+      setNotification({ message: null, severity: null });
+    }, 5000)
+  }
+
+  const showError = (message) => {
+    setNotification({ message, severity: "error" })
+    setTimeout(() => {
+      setNotification({ message: null, severity: null });
+    }, 5000)
+  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -47,11 +64,8 @@ const App = () => {
       setPassword('')
       console.log(user);
     } catch (exception) {
-      //setErrorMessge('Wrong credentials')
-      setErrorMessge('Wrong credentials:', exception)
-      setTimeout(() => {
-        setErrorMessge(null)
-      }, 5000)
+      //setErrorMessage('Wrong credentials')
+      showError('Wrong username or password')
     }
   }
 
@@ -59,20 +73,26 @@ const App = () => {
     console.log('logged out')
     window.localStorage.removeItem('loggedBlogappUser')
     window.location.reload(false) // Refresh the page
+    setNotification({ message: 'Logged out', severity: 'blog' })
   }
   
   const handleCreateBlog = async (event) => {
     event.preventDefault()
-    console.log(`created new blog: ${title}, ${author} - ${url}`)
+    console.log(`creating new blog: ${title}, ${author} - ${url}`)
     const newBlog = {
       title,
       author,
       url,
       likes: 0
     }
-    await blogService.create(newBlog)
-    const newBlogList = await blogService.getAll()
-    setBlogs(newBlogList)
+    try {
+      await blogService.create(newBlog)
+      const newBlogList = await blogService.getAll()
+      setBlogs(newBlogList)
+      showNotification(`A new blog '${title}' by ${author} was added`)
+    } catch (exception) {
+      showError(`Failed to create blog '${title}' by ${author}`)
+    }
 
     setTitle('')
     setAuthor('')
@@ -139,20 +159,20 @@ const App = () => {
           <button type='submit'>create</button>
         </div>
       </form>
-      <form>
+      <h3>blogs</h3>
+      <ul>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
       )}
-      <button type="submit">save</button>
-      </form>  
+      </ul>  
     </div>
   )
 
   return (
     <div>
       <h1>Bloglist app</h1>
-      
-      <Notification message={errorMessage} />
+
+      <Notification message={notification.message} severity={notification.severity} />
   
     {
       user === null ?
