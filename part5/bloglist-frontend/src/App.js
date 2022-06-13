@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+  import { useState, useEffect, useRef } from 'react'
 import Notification from './components/Notification'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -96,13 +96,26 @@ const App = () => {
     }
   }
 
-  const updateBlog = async (blogObject) => {
+  const updateBlog = async blogObject => {
     try {
       await blogService.update(blogObject)
       showNotification(`Updated blog '${blogObject.title}' by ${blogObject.author}`)
       setBlogs(blogs.map(blog => blog.id === blogObject.id ? blogObject : blog))
     } catch (exception) {
-      showError('Failed to add like')
+      showError('Failed to update blog')
+      console.log(exception)
+    }
+  }
+
+  const deleteBlog = async blogObject => {
+    try {
+      if (window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}`)){
+        await blogService.del(blogObject)
+        showNotification(`Deleted blog '${blogObject.title}' by ${blogObject.author}`)
+        setBlogs(blogs.filter(blog => blog.id !== blogObject.id))
+      }
+    } catch (exception) {
+      showError('Failed to delete blog')
       console.log(exception)
     }
   }
@@ -123,7 +136,7 @@ const App = () => {
         <h3>blogs</h3>
         <ul>
         {blogs.sort((a, b) => a.likes < b.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
         )}
         </ul>  
       </div>
