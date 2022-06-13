@@ -96,6 +96,17 @@ const App = () => {
     }
   }
 
+  const updateBlog = async (blogObject) => {
+    try {
+      await blogService.update(blogObject)
+      showNotification(`Updated blog '${blogObject.title}' by ${blogObject.author}`)
+      setBlogs(blogs.map(blog => blog.id === blogObject.id ? blogObject : blog))
+    } catch (exception) {
+      showError('Failed to add like')
+      console.log(exception)
+    }
+  }
+
   return (
     <div>
       <h1>Bloglist app</h1>
@@ -112,7 +123,7 @@ const App = () => {
         <h3>blogs</h3>
         <ul>
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
         )}
         </ul>  
       </div>
