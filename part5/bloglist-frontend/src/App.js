@@ -1,4 +1,4 @@
-  import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Notification from './components/Notification'
 import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
@@ -16,13 +16,13 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState({
     message: null,
-    severity: ""
+    severity: ''
   })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -35,16 +35,16 @@ const App = () => {
   }, [])
 
   const showNotification = (message) => {
-    setNotification({ message, severity: "blog" })
+    setNotification({ message, severity: 'blog' })
     setTimeout(() => {
-      setNotification({ message: null, severity: null });
+      setNotification({ message: null, severity: null })
     }, 5000)
   }
 
   const showError = (message) => {
-    setNotification({ message, severity: "error" })
+    setNotification({ message, severity: 'error' })
     setTimeout(() => {
-      setNotification({ message: null, severity: null });
+      setNotification({ message: null, severity: null })
     }, 5000)
   }
 
@@ -63,22 +63,20 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      console.log(user);
     } catch (exception) {
       //setErrorMessage('Wrong credentials')
       showError('Wrong username or password')
     }
   }
 
-  const handleLogout = (event) => {
-    console.log('logged out')
+  const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     window.location.reload(false) // Refresh the page
-    setNotification({ message: 'Logged out', severity: 'blog' })
+    setNotification({ message: 'Logging out', severity: 'blog' })
   }
 
   const blogFormRef = useRef()
-  
+
   const blogForm = () => (
     <Togglable buttonLabel='create new blog' ref={blogFormRef}>
       <BlogForm createBlog={addBlog} />
@@ -103,7 +101,6 @@ const App = () => {
       setBlogs(blogs.map(blog => blog.id === blogObject.id ? blogObject : blog))
     } catch (exception) {
       showError('Failed to update blog')
-      console.log(exception)
     }
   }
 
@@ -116,7 +113,6 @@ const App = () => {
       }
     } catch (exception) {
       showError('Failed to delete blog')
-      console.log(exception)
     }
   }
 
@@ -125,23 +121,23 @@ const App = () => {
       <h1>Bloglist app</h1>
 
       <Notification message={notification.message} severity={notification.severity} />
-  
-    {
-      user === null ?
-      <LoginForm username={username} setUsername={setUsername} password={password} setPassword={setPassword} handleLogin={handleLogin} /> :
-      <div>
-        <p>{user.name} logged in
-        <button onClick={handleLogout}>log out</button></p>
-        {blogForm()}
-        <h3>blogs</h3>
-        <ul>
-        {blogs.sort((a, b) => a.likes < b.likes).map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} username={user.username} deleteBlog={deleteBlog} />
-        )}
-        </ul>  
-      </div>
-    }
-      
+
+      {
+        user === null ?
+          <LoginForm username={username} setUsername={setUsername} password={password} setPassword={setPassword} handleLogin={handleLogin} /> :
+          <div>
+            <p>{user.name} logged in
+              <button onClick={handleLogout}>log out</button></p>
+            {blogForm()}
+            <h3>blogs</h3>
+            <ul>
+              {blogs.sort((a, b) => a.likes < b.likes).map(blog =>
+                <Blog key={blog.id} blog={blog} updateBlog={updateBlog} username={user.username} deleteBlog={deleteBlog} />
+              )}
+            </ul>
+          </div>
+      }
+
     </div>
   )
 }
