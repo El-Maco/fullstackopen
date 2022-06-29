@@ -77,12 +77,6 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  const blogForm = () => (
-    <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-      <BlogForm createBlog={addBlog} />
-    </Togglable>
-  )
-
   const addBlog = async blogObject => {
     try {
       blogFormRef.current.toggleVisibility()
@@ -93,6 +87,12 @@ const App = () => {
       showError(`Failed to create blog '${blogObject.title}' by ${blogObject.author}`)
     }
   }
+
+  const blogForm = () => (
+    <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+      <BlogForm createBlog={addBlog} />
+    </Togglable>
+  )
 
   const updateBlog = async blogObject => {
     try {
