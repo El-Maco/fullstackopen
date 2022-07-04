@@ -23,7 +23,7 @@ describe('Testing BlogForm', () => {
     ).container
   })
   test('creating new blog calls the event handler with the right details', async () => {
-    
+
     const titleInput = container.querySelector('#title-input')
     const authorInput = container.querySelector('#author-input')
     const urlInput = container.querySelector('#url-input')

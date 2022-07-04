@@ -5,11 +5,9 @@ import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
-//import login from './services/login'
 import loginService from './services/login'
 
 const App = () => {
-  //const [loginVisible, setLoginVisible] = useState(false)
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -35,7 +33,7 @@ const App = () => {
   }, [])
 
   const showNotification = (message) => {
-    setNotification({ message, severity: 'blog' })
+    setNotification({ message, severity: 'normal' })
     setTimeout(() => {
       setNotification({ message: null, severity: null })
     }, 5000)
@@ -64,7 +62,6 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      //setErrorMessage('Wrong credentials')
       showError('Wrong username or password')
     }
   }
@@ -85,6 +82,7 @@ const App = () => {
       showNotification(`A new blog '${blogObject.title}' by ${blogObject.author} was added`)
     } catch (exception) {
       showError(`Failed to create blog '${blogObject.title}' by ${blogObject.author}`)
+      console.log(exception)
     }
   }
 

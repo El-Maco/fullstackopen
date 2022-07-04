@@ -14,6 +14,7 @@ const BlogForm = ({ createBlog }) => {
       url,
       likes: 0
     }
+    console.log('newBlog:', newBlog)
 
     createBlog(newBlog)
 
@@ -57,7 +58,7 @@ const BlogForm = ({ createBlog }) => {
           />
         </div>
         <div>
-          <button type='submit'>create</button>
+          <button id="create-button" type='submit'>create</button>
         </div>
       </form>
     </div>

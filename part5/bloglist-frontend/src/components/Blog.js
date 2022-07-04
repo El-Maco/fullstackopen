@@ -17,10 +17,10 @@ const Blog = ({ blog, username, updateBlog, deleteBlog }) => {
   }
 
   const addLike = () => {
-    const updatedBlog = {
+    const updatedBlog = ({
       ...blog,
       likes: blog.likes + 1
-    }
+    })
     updateBlog(updatedBlog)
   }
 
